@@ -1,7 +1,7 @@
 "use strict";
 
 const apiManager = (function () {
-    const API_KEY = "odfqlILFpvxzdXhFGjK8AIKyQlLpO22hM259pvrs" // odfqlILFpvxzdXhFGjK8AIKyQlLpO22hM259pvrs - KASHI  // - ACsJrPYqG2NleSki1rWH1DjyKtqkxd7prMqy68D5  - MY
+    const API_KEY = "ACsJrPYqG2NleSki1rWH1DjyKtqkxd7prMqy68D5"
     const NASA_URL = "https://api.nasa.gov/mars-photos/api/v1/rovers"
 
     const fetchData = async (url) => {
