@@ -64,15 +64,19 @@
                 <div class="form-group col">
                     <label for="date-format">Select a date format:</label><br>
                     <select class="form-control" id="date-format" required>
-                        <option value="Male">Please choose date format</option>
-                        <option value="Male">Earth Date</option>
-                        <option value="Female">Mars Date (Sol)</option>
+                        <option value="earth_date">Earth Date</option>
+                        <option value="sol">Mars Date (Sol)</option>
                     </select>
                 </div>
+                <div class="earthDate form-group col" id="earthDate" >
+                    <label for="date-picker-input" >Date:</label>
+                    <input class="form-control" type="date" id="date-picker-input">
 
-                <div class="form-group col">
-                <label for="date-picker" >Date:</label>
-                <input class="form-control" type="date" id="date-picker" disabled>
+                </div>
+                <div class="solDate form-group col d-none" id="solDate">
+                    <label for="sol-picker-input" >Sol:</label>
+                    <input class="form-control" type="number" id="sol-picker-input" min="0" required disabled>
+
                 </div>
             </div>
             <div class="row mb-2">
@@ -84,7 +88,7 @@
 
             <div class="row mb-2">
                 <label for="camera-select">Select a camera:</label>
-                <select class="form-control" id="camera-select" required>
+                <select class="form-control" id="camera-select" required disabled>
                     <option value="">Please select a rover first.</option>
                 </select>
             </div>

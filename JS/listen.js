@@ -11,10 +11,11 @@
 
 
         //form content
-        const dateFormat = document.getElementById("ate-format");
-        const DateSelection = document.getElementById("date-picker");
+        const dateFormat = document.getElementById("date-format");
+        const DateSelection = document.getElementById("earthDate");
+        const SolSelection = document.getElementById("solDate");
 
-        const searchButton = document.getElementById("search-Button");
+        const SearchButton = document.getElementById("search-Button");
         const ClearButton = document.getElementById("clear-Button");
         const roverSelection = document.getElementById("rover-select");
 
@@ -29,19 +30,26 @@
         dateFormat.addEventListener("change", function () {
             htmlManager.addDateFormat();
         });
-        //
-        // DateSelection.addEventListener("change", function () {
-        //
-        // });
+
+
+        SolSelection.addEventListener("change", function () {
+            htmlManager.checkDate();
+        });
 
         roverSelection.addEventListener("change", function () {
-            htmlManager.addCameras(roverSelection.value);
+            htmlManager.addCameras();
+            htmlManager.updateDates();
         });
 
         // cameraSelection.addEventListener("click", function () {
         //
         // });
         //
+
+        SearchButton.addEventListener("click" , function () {
+            htmlManager.getImages();
+        });
+
         ClearButton.addEventListener("click", function () {
             htmlManager.clearForm();
         });

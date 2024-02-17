@@ -39,18 +39,29 @@
 }
 */
 
-const htmlManager= (function () {
+const htmlManager= (function (qualifiedName, value) {
     //Array for rovers and cameras
     const roversArray = []
-    const camerasArray = []
 
     //DOM elements
+    const dateFormat = document.getElementById("date-format");
+
+    const DateSelection = document.getElementById("earthDate");
+    const DateSelectionInput = document.getElementById("date-picker-input");
+    const SolSelection = document.getElementById("solDate");
+    const SolSelectionInput = document.getElementById("sol-picker-input");
+
     const spinnerLoader = document.getElementById("spinner-loader");
     const roverSelection = document.getElementById("rover-select");
     const cameraSelection = document.getElementById("camera-select");
 
+
+
+
     //default string
     const cameraSelectionMassage = '<option>Please select a rover first.</option>';
+    const earthDateSelection = "earth_date";
+    const marsDateSelection = "sol";
 
     const registerRovers = function (res) {
         res["rovers"].forEach(rover => roversArray.push(rover))
@@ -70,36 +81,83 @@ const htmlManager= (function () {
         });
     };
 
+    const selectedRover = () => roversArray.find(rover => rover.name === roverSelection.value);
 
-    const addCameras = function (nameOfRover) {
-        const selectedRover = roversArray.find(rover=>rover.name === nameOfRover);
-        cameraSelection.innerHTML = ''; // clear the selection
-        console.log(selectedRover)
-        if(selectedRover) {
-            selectedRover["cameras"].forEach((camera)=> {
+    const addCameras = function () {
+        cameraSelection.disabled = false;
+        cameraSelection.innerHTML = cameraSelectionMassage; // default string.
+        if(selectedRover()) {
+            selectedRover()["cameras"].forEach((camera)=> {
                 const newCamera = document.createElement("option");
-                newCamera.value = newCamera.innerText = camera.full_name;
+                newCamera.value = camera.name;
+                newCamera.innerText = camera.full_name;
                 cameraSelection.appendChild(newCamera);
             });
-        } else {
-            cameraSelection.innerHTML = cameraSelectionMassage; // default string.
         }
+    };
+
+
+    const updateDates = function () {
+        const rover = selectedRover();
+        DateSelectionInput.min = rover.landing_date;
+        DateSelectionInput.max = rover.max_date;
+        SolSelectionInput.max = rover.max_sol; //sol min is 0
     };
 
     const clearForm = function () {
 
     };
 
+    /**
+     * Toggle between Earth and Mars date selections.
+     * @param {string} date - The selected date ('earth' or 'mars').
+     */
     const addDateFormat = function () {
+        const earthSelected = dateFormat.value === earthDateSelection; // Check if Earth date is selected
 
+        DateSelection.classList.toggle("d-none", !earthSelected);
+        DateSelectionInput.disabled = !earthSelected;
+
+        SolSelection.classList.toggle("d-none", earthSelected);
+        SolSelectionInput.disabled = earthSelected;
     };
 
+    const checkDate = function (date) {
+        if(dateFormat.value === earthDateSelection) {
+            validation.earthDateCheck(DateSelectionInput.value, DateSelectionInput.min, DateSelectionInput.max );
+
+        } else if (dateFormat.value === marsDateSelection) {
+            validation.solDateCheck(SolSelectionInput.max, SolSelectionInput.value);
+        }
+    };
+
+
+    const getImages = function () {
+        const selectedRoverData = selectedRover();
+
+        if(selectedRoverData) {
+            const rover = {
+                "roverName" : selectedRover().name,
+                "camera" : cameraSelection.value,
+                "dateFormat" : dateFormat.value,
+                "earth_date" :  DateSelectionInput.value,
+                "sol" : SolSelectionInput.value
+            };
+            apiManager.fetchImages(rover);
+        }
+
+    };
 
     return {
         registerRovers : registerRovers,
         addCameras : addCameras,
         clearForm : clearForm,
-        addDateFormat: addDateFormat,
+        addDateFormat : addDateFormat,
+        updateDates : updateDates,
+        checkDate : checkDate,
+        getImages : getImages,
+
+
     }
 
 })();
