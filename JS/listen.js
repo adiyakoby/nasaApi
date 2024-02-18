@@ -45,10 +45,12 @@
 
         HomeButton.addEventListener("click", function () {
             htmlManager.showHome();
+            htmlManager.addImagesToCarousel();
         });
 
         SavedImagesButton.addEventListener("click", function () {
-            htmlManager.showSavedImages();
+            htmlManager.renderSavedImages()
+            htmlManager.showSavedImagesPage();
         });
 
 

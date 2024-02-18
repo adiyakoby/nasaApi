@@ -1,8 +1,6 @@
 "use strict";
 
 const htmlManager= (function (qualifiedName, value) {
-    //Array for rovers and cameras
-    const roversArray = []
 
     //DOM elements
     const homePage = document.getElementById("home-page");
@@ -20,9 +18,11 @@ const htmlManager= (function (qualifiedName, value) {
     const cameraSelection = document.getElementById("camera-select");
 
     const imagesContainer = document.getElementById("images-container");
+    const savedImagesContainer = document.getElementById("saved-images-container");
     const emptyArrayAlert = document.getElementById("empty-array-alert");
 
     const toastLiveExample = document.getElementById('liveToast');
+    const carouselInner = document.getElementById('carousel-inner');
 
 
 
@@ -33,28 +33,24 @@ const htmlManager= (function (qualifiedName, value) {
     const marsDateSelection = "sol";
 
 
-    const registerRovers = function (res) {
-        res["rovers"].forEach(rover => roversArray.push(rover))
-        spinnerToggle();
-        addRovers();
-    };
-
     const spinnerToggle = function () {
         spinnerLoader.classList.toggle("d-none");
     };
 
-    const addRovers = function () {
-    roversArray.forEach((rover)=> {
-        const newRover = document.createElement("option");
-        newRover.value = newRover.innerText = rover.name;
-        roverSelection.appendChild(newRover);
-        });
+    const addRovers = function (roversArr) {
+        roversArr.forEach((rover)=> {
+            const newRover = document.createElement("option");
+            newRover.value = newRover.innerText = rover.name;
+            roverSelection.appendChild(newRover);
+            });
+        spinnerToggle();
     };
 
-    const selectedRover = () => roversArray.find(rover => rover.name === roverSelection.value);
+    const selectedRover = () => roversBank.getRovers().find(rover => rover.name === roverSelection.value);
 
     const inValidElements = () => Array.from(NasaForm.elements).forEach(element => {
         if(element.value === '') element.classList.add("is-invalid")
+        else if(element.type === "type" || element.type === "number") checkDate();
         else element.classList.remove("is-invalid");
     });
 
@@ -107,18 +103,25 @@ const htmlManager= (function (qualifiedName, value) {
     };
 
     const checkDate = function () {
-        if(dateFormat.value === earthDateSelection) {
-            return validation.isEarthDateValid(DateSelectionInput.value, DateSelectionInput.min, DateSelectionInput.max );
 
-        } else if (dateFormat.value === marsDateSelection) {
-            return validation.isSolDateValid(parseInt(SolSelectionInput.value), SolSelectionInput.max);
+        if(dateFormat.value === earthDateSelection && !validation.isEarthDateValid(DateSelectionInput.value, DateSelectionInput.min, DateSelectionInput.max)) {
+            DateSelectionInput.classList.add("is-invalid");
+            return false;
+
+        } else if (dateFormat.value === marsDateSelection && !validation.isSolDateValid(parseInt(SolSelectionInput.value), SolSelectionInput.max)) {
+            SolSelectionInput.classList.add("is-invalid");
+            return false;
         }
+        DateSelectionInput.classList.remove("is-invalid");
+        SolSelectionInput.classList.remove("is-invalid");
+        return true;
     };
 
 
     const getImages = function () {
         spinnerToggle();
         emptyArrayAlert.classList.add("d-none");
+        imagesContainer.innerHTML = '';
 
         try{
             if(validation.isFormValid(NasaForm) && checkDate()) {
@@ -133,6 +136,8 @@ const htmlManager= (function (qualifiedName, value) {
                     .then(showImages)
             } else {
                 spinnerToggle();
+                emptyArrayAlert.classList.remove("d-none");
+
             }
         } catch (error) {
             console.log("Error fetching data:", error);
@@ -155,40 +160,41 @@ const htmlManager= (function (qualifiedName, value) {
 
 
     const showImages = function (res) {
-        imagesContainer.innerHTML = '';
-        if(res && res["photos"].length > 0) {
-            emptyArrayAlert.classList.add("d-none");
-            let limit = (res["photos"].length > 50 ? 50 : res["photos"].length);
-            res["photos"].slice(0, limit).forEach(photo => createNewImage(photo));
-        } else {
-            emptyArrayAlert.classList.remove("d-none");
+        try {
+            if(imagesBank.registerImages(res)) {
+                imagesBank.getImages().forEach(img => createDivImage(img))
+            } else {
+                emptyArrayAlert.classList.remove("d-none");
+            }
+        } catch (error) {
+            console.log("Error fetching images:", error);
         }
         spinnerToggle();
     };
 
-    const cardBodyDivCreator = (date, sol, camera, rover, src) => {
-        return  `<p class="card-text">Earth date: ${date}</p>
-                  <p class="card-text">Sol: ${sol}</p>
-                  <p class="card-text">Camera: ${camera}</p>
-                  <p class="card-text">Mission: ${rover}</p>
-                  <a href=#" class="btn btn-primary" onclick="imagesBank.saveImage(this.parentNode.parentNode)">Save</a>
-                  <a href="${src}" class="btn btn-primary" target="_blank">Full size</a>`;
+    const cardBodyDivCreator = (date, sol, camera, mission, src) => {
+        return  `
+          <p class="card-text">Earth date: ${date}</p>
+          <p class="card-text">Sol: ${sol}</p>
+          <p class="card-text">Camera: ${camera}</p>
+          <p class="card-text">Mission: ${mission}</p>
+          <a href=#" class="btn btn-primary" onclick="imagesBank.saveImage(this.nextElementSibling.getAttribute('href'))">Save</a>
+          <a href="${src}" class="btn btn-primary" target="_blank">Full size</a>`;
     };
 
-    const createNewImage = function (img) {
-
+    const createDivImage = function (img) {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'card col-md-4';
         cardDiv.style.width = '18rem';
 
         const imgElement = document.createElement('img');
-        Object.assign(imgElement, { src: img.img_src, className: 'card-img-top', alt: 'nasaPhoto' , id:`${img.id}`});
+        Object.assign(imgElement, { src: img.src, className: 'card-img-top', alt: 'nasaPhoto' , id:`${img.id}` });
 
         const cardBodyDiv = document.createElement('div');
         cardBodyDiv.className = 'card-body';
 
         // Create and append elements using a template literal
-        cardBodyDiv.innerHTML = cardBodyDivCreator(img.earth_date, img.sol, img.camera.name, img.rover.name, img.img_src);
+        cardBodyDiv.innerHTML = cardBodyDivCreator(img.earth_date, img.sol, img.camera, img.mission, img.src);
 
         // Append the elements to the appropriate parent elements
         cardDiv.appendChild(imgElement);
@@ -217,73 +223,73 @@ const htmlManager= (function (qualifiedName, value) {
         toastBootstrap.show();
     };
 
-    function extractCardInfo(cardElement) {
-        // Extracting information from the card element
-        let earthDate = cardElement.getElementsByClassName('card-text')[0].innerText;
-        let sol = cardElement.getElementsByClassName('card-text')[1].innerText;
-        let camera = cardElement.getElementsByClassName('card-text')[2].innerText;
-        let id = cardElement.getElementsByTagName('img')[0].id;
-        let src = cardElement.getElementsByTagName('img')[0].src;
 
-        // Returning the extracted information
-        return {
-            earth_date: earthDate,
-            sol: sol,
-            camera: camera,
-            id: id,
-            src: src
-        };
-    }
-    const cardBodySavedImagesCreator = function (imageData) {
+    const cardBodySavedImagesCreator = function (img) {
         return `<div class="row g-0">
-                <div class="col-md-4">
-                    <img src="${imageData.src}" class="img-fluid rounded-start" alt="nasa-image"> 
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <p class="card-text">${imageData.earth_date}, ${imageData.sol}<br>${imageData.camera}, id: ${imageData.id}</p>
-                        <button class="btn btn-danger col-6" onclick="">delete</button>
+                    <div class="col-md-4">
+                        <img src="${img.src}" class="img-fluid rounded-start" alt="nasa-image"> 
                     </div>
-                
+                    <div class="col-md-8">
+                        <div class="card-body" data-img-id="${img.id}" data-img-src="${img.src}">
+                            <p class="card-text" > earth_date: ${img.earth_date}, sol: ${img.sol}<br>camera: ${img.camera}, id: ${img.id}</p>
+                            <button class="btn btn-danger col-12" onclick="imagesBank.eraseImage(this.parentNode)">delete</button>
+                        </div>
                     </div>
                 </div>`;
     }
 
-    const addImage = function (image) {
-        const imageData = extractCardInfo(image);
-        //savedImagesPage.appendChild();
+    const addImage = function (img) {
         const cardDiv = document.createElement('div');
-        cardDiv.className = 'card mb-3';
+        cardDiv.className = 'card col-md-4';
         cardDiv.style.maxWidth = '540px';
 
-        cardDiv.innerHTML = cardBodySavedImagesCreator(imageData);
-        savedImagesPage.appendChild(cardDiv);
+        cardDiv.innerHTML = cardBodySavedImagesCreator(img);
+        savedImagesContainer.appendChild(cardDiv);
 
     };
+
+    const addImagesToCarousel = function () {
+        imagesBank.getSavedImages().forEach(function (img) {
+
+            const imgDiv = document.createElement("div");
+            imgDiv.className = "carousel-item";
+            const imgElement = document.createElement('img');
+            Object.assign(imgElement, { src: img.src, className: 'd-block w-100', alt: 'nasaPhoto'});
+            imgDiv.appendChild(imgElement);
+            console.log(imgDiv);
+            carouselInner.appendChild(imgDiv);
+        })
+    }
 
 
     const showHome = () => {
         homePage.classList.remove("d-none")
         savedImagesPage.classList.add("d-none")
     };
-    const showSavedImages = () => {
+    const showSavedImagesPage = () => {
         homePage.classList.add("d-none");
         savedImagesPage.classList.remove("d-none");
     };
+    
+    const renderSavedImages = function () {
+        savedImagesContainer.innerHTML = "";
+        imagesBank.getSavedImages().forEach(img => addImage(img));
+    }
 
     return {
-        registerRovers : registerRovers,
+        addRovers: addRovers,
         addCameras : addCameras,
         clearForm : clearForm,
         updateDateFormat : updateDateFormat,
         updateDates : updateDates,
         getImages : getImages,
-        createNewImage : createNewImage,
         inValidElements : inValidElements,
         showHome : showHome,
-        showSavedImages : showSavedImages,
+        showSavedImagesPage : showSavedImagesPage,
         showToast : showToast,
         addImage : addImage,
+        addImagesToCarousel : addImagesToCarousel,
+        renderSavedImages: renderSavedImages,
 
     }
 

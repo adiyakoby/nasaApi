@@ -3,7 +3,7 @@
 const apiManager = (function () {
     const API_KEY = "odfqlILFpvxzdXhFGjK8AIKyQlLpO22hM259pvrs" // KASHI
     //const API_KEY = "ACsJrPYqG2NleSki1rWH1DjyKtqkxd7prMqy68D5" // MY
-    const NASA_URL = "https://api.nasa.gov/mars-photos/api/v1/rovers" //https://api.nasa.gov/mars-photos/api/v1/rovers/spirit/photos?api_key=odfqlILFpvxzdXhFGjK8AIKyQlLpO22hM259pvrs&sol=3=
+    const NASA_URL = "https://api.nasa.gov/mars-photos/api/v1/rovers"
 
     const fetchData = async (url) => {
         try {
@@ -19,7 +19,11 @@ const apiManager = (function () {
         try {
             const url = `${NASA_URL}?api_key=${API_KEY}`;
             const data = await fetchData(url);
-            if (data) htmlManager.registerRovers(data);
+            if (data) {
+                roversBank.registerRovers(data);
+                htmlManager.addRovers(roversBank.getRovers());
+
+            }
         }
         catch (e) {
             console.log("Error fetching data:", e);
