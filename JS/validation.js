@@ -10,11 +10,11 @@ const validation = (function () {
         }
     };
 
-    const solDateCheck = function (maxDate, userInput) {
-        return !(userInput < 0 || userInput > maxDate);
+    const isSolDateValid = function (userInput, maxDate) {
+        return userInput >= 0 && userInput <= maxDate;
     };
 
-    function earthDateCheck(date, startDate, endDate) {
+    const isEarthDateValid = function (date, startDate, endDate) {
         const currentDate = new Date(date);
         const start = new Date(startDate);
         const end = new Date(endDate);
@@ -23,10 +23,31 @@ const validation = (function () {
     }
 
 
+
+    const isInvalidElement  = (element) => {
+        // const cond = !(element.hasAttribute("required") &&
+        //                         !(element.parentNode.classList.contains("d-none")) &&
+        //                           element.value.trim() === '');
+        //
+        // if(!cond) htmlManager.inValidElement(element);
+        // return cond;
+
+       return !(element.hasAttribute("required") &&
+                !(element.parentNode.classList.contains("d-none")) &&
+                element.value.trim() === '');
+    };
+
+
+    const isFormValid = (form) => {
+        return Array.from(form.elements).every(isInvalidElement);
+    };
+
+
     return {
         statusCheck: statusCheck,
-        solDateCheck: solDateCheck,
-        earthDateCheck: earthDateCheck,
+        isSolDateValid: isSolDateValid,
+        isEarthDateValid: isEarthDateValid,
+        isFormValid: isFormValid,
     }
 
 })();

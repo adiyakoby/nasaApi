@@ -1,47 +1,9 @@
 "use strict";
 
-/*
-{
-    "id": 7,
-    "name": "Spirit",
-    "landing_date": "2004-01-04",
-    "launch_date": "2003-06-10",
-    "status": "complete",
-    "max_sol": 2208,
-    "max_date": "2010-03-21",
-    "total_photos": 124550,
-    "cameras": [
-        {
-            "name": "FHAZ",
-            "full_name": "Front Hazard Avoidance Camera"
-        },
-        {
-            "name": "NAVCAM",
-            "full_name": "Navigation Camera"
-        },
-        {
-            "name": "PANCAM",
-            "full_name": "Panoramic Camera"
-        },
-        {
-            "name": "MINITES",
-            "full_name": "Miniature Thermal Emission Spectrometer (Mini-TES)"
-        },
-        {
-            "name": "ENTRY",
-            "full_name": "Entry, Descent, and Landing Camera"
-        },
-        {
-            "name": "RHAZ",
-            "full_name": "Rear Hazard Avoidance Camera"
-        }
-    ]
-}
-*/
-
 const htmlManager= (function (qualifiedName, value) {
     //Array for rovers and cameras
     const roversArray = []
+    const imagesArray = []
 
     //DOM elements
     const dateFormat = document.getElementById("date-format");
@@ -56,10 +18,12 @@ const htmlManager= (function (qualifiedName, value) {
     const cameraSelection = document.getElementById("camera-select");
 
 
-
+    const NasaForm = document.getElementById("nasaForm");
+    const imagesContainer = document.getElementById("images-container");
+    const emptyArrayAlert = document.getElementById("empty-array-alert");
 
     //default string
-    const cameraSelectionMassage = '<option>Please select a rover first.</option>';
+    const cameraSelectionMessage  = '<option value="">Please select a rover first.</option>';
     const earthDateSelection = "earth_date";
     const marsDateSelection = "sol";
 
@@ -68,7 +32,7 @@ const htmlManager= (function (qualifiedName, value) {
         spinnerToggle();
         addRovers();
     };
-    
+
     const spinnerToggle = function () {
         spinnerLoader.classList.toggle("d-none");
     };
@@ -83,9 +47,16 @@ const htmlManager= (function (qualifiedName, value) {
 
     const selectedRover = () => roversArray.find(rover => rover.name === roverSelection.value);
 
+    const inValidElements = () => Array.from(NasaForm.elements).forEach(element => {
+        if(element.value === '') element.classList.add("is-invalid")
+        else element.classList.remove("is-invalid");
+    });
+
+
     const addCameras = function () {
-        cameraSelection.disabled = false;
-        cameraSelection.innerHTML = cameraSelectionMassage; // default string.
+        cameraSelection.disabled = false; //let the user choose a camera
+        cameraSelection.innerHTML = cameraSelectionMessage; // default string.
+
         if(selectedRover()) {
             selectedRover()["cameras"].forEach((camera)=> {
                 const newCamera = document.createElement("option");
@@ -99,52 +70,122 @@ const htmlManager= (function (qualifiedName, value) {
 
     const updateDates = function () {
         const rover = selectedRover();
-        DateSelectionInput.min = rover.landing_date;
-        DateSelectionInput.max = rover.max_date;
-        SolSelectionInput.max = rover.max_sol; //sol min is 0
+        if(rover) {
+            roverSelection.classList.remove("is-invalid");
+            DateSelectionInput.min = rover.landing_date;
+            DateSelectionInput.max = rover.max_date;
+            SolSelectionInput.max = rover.max_sol; //sol min is 0
+        }
     };
 
-    const clearForm = function () {
-
-    };
 
     /**
-     * Toggle between Earth and Mars date selections.
-     * @param {string} date - The selected date ('earth' or 'mars').
+     * Toggles visibility and enables/disables input elements based on Earth or Martian Sol date selection.
+     *
+     * @function
+     * @name addDateFormat
+     * @description This function is designed to toggle the visibility and disable/enable input elements
+     * based on whether the Earth date or Martian Sol date is selected.
+     *
      */
     const addDateFormat = function () {
         const earthSelected = dateFormat.value === earthDateSelection; // Check if Earth date is selected
 
         DateSelection.classList.toggle("d-none", !earthSelected);
         DateSelectionInput.disabled = !earthSelected;
+        DateSelectionInput.classList.remove("is-invalid");
 
         SolSelection.classList.toggle("d-none", earthSelected);
         SolSelectionInput.disabled = earthSelected;
+        SolSelectionInput.classList.remove("is-invalid");
     };
 
-    const checkDate = function (date) {
+    const checkDate = function () {
         if(dateFormat.value === earthDateSelection) {
-            validation.earthDateCheck(DateSelectionInput.value, DateSelectionInput.min, DateSelectionInput.max );
+            return validation.isEarthDateValid(DateSelectionInput.value, DateSelectionInput.min, DateSelectionInput.max );
 
         } else if (dateFormat.value === marsDateSelection) {
-            validation.solDateCheck(SolSelectionInput.max, SolSelectionInput.value);
+            return validation.isSolDateValid(parseInt(SolSelectionInput.value), SolSelectionInput.max);
         }
     };
 
 
     const getImages = function () {
-        const selectedRoverData = selectedRover();
+        try{
+            if(validation.isFormValid(NasaForm) && checkDate()) {
+                const rover = {
+                    "roverName": selectedRover().name,
+                    "camera": cameraSelection.value,
+                    "dateFormat": dateFormat.value,
+                    "earth_date": DateSelectionInput.value,
+                    "sol": SolSelectionInput.value
+                };
 
-        if(selectedRoverData) {
-            const rover = {
-                "roverName" : selectedRover().name,
-                "camera" : cameraSelection.value,
-                "dateFormat" : dateFormat.value,
-                "earth_date" :  DateSelectionInput.value,
-                "sol" : SolSelectionInput.value
-            };
-            apiManager.fetchImages(rover);
+                apiManager.fetchImages(rover)
+                    .then(showImages)
+            }
+        } catch (error) {
+            console.log("Error fetching data:", error);
         }
+        finally
+        {
+            inValidElements();
+        }
+
+    };
+
+    const clearForm = function () {
+        NasaForm.reset();
+        addDateFormat();
+        emptyArrayAlert.classList.add("d-none");
+        Array.from(NasaForm.elements).forEach(e=>e.classList.remove("is-invalid"));
+
+    };
+
+
+    const showImages = function (res) {
+        imagesContainer.innerHTML = '';
+        if(res && res["photos"].length > 0) {
+            emptyArrayAlert.classList.add("d-none");
+            let limit = (res["photos"].length > 50 ? 50 : res["photos"].length);
+            res["photos"].slice(0, limit).forEach(photo => createNewImage(photo));
+        } else {
+            emptyArrayAlert.classList.remove("d-none");
+        }
+
+    };
+    
+    const createNewImage = function (img) {
+
+        const src = img.img_src;
+
+        // Create the main container div with class "card" and style
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card col-md-4';
+        //cardDiv.style.width = '18rem';
+
+        // Create the image element with class "card-img-top"
+        const imgElement = document.createElement('img');
+        Object.assign(imgElement, { src: src, className: 'card-img-top', alt: 'nasaPhoto' });
+
+        // Create the div with class "card-body"
+        const cardBodyDiv = document.createElement('div');
+        cardBodyDiv.className = 'card-body';
+
+        // Create and append elements using a template literal
+        cardBodyDiv.innerHTML = `
+          <p class="card-text">Earth date: ${img.earth_date}</p>
+          <p class="card-text">Sol: ${img.sol}</p>
+          <p class="card-text">Camera: ${img.camera.name}</p>
+          <p class="card-text">Mission: ${img.rover.name}</p>
+          <a href=#" class="btn btn-primary" onclick="">Save</a>
+          <a href="${src}" class="btn btn-primary" target="_blank">Full size</a>`;
+
+        // Append the elements to the appropriate parent elements
+        cardDiv.appendChild(imgElement);
+        cardDiv.appendChild(cardBodyDiv);
+
+        imagesContainer.appendChild(cardDiv);
 
     };
 
@@ -154,8 +195,10 @@ const htmlManager= (function (qualifiedName, value) {
         clearForm : clearForm,
         addDateFormat : addDateFormat,
         updateDates : updateDates,
-        checkDate : checkDate,
         getImages : getImages,
+        createNewImage : createNewImage,
+        inValidElements: inValidElements,
+
 
 
     }

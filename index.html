@@ -59,7 +59,7 @@
     <h6>First select a date format then a date and a rover. Select a camera (optional) and hit search. Then add images to
         your preferred list. Browse your preferred list, remove images, start or stop a carousel.</h6>
     <div>
-        <form class="form-group mb-3 " id="firstForm">
+        <form class="form-group mb-3 " id="nasaForm">
             <div class="row mb-2">
                 <div class="form-group col">
                     <label for="date-format">Select a date format:</label><br>
@@ -70,12 +70,18 @@
                 </div>
                 <div class="earthDate form-group col" id="earthDate" >
                     <label for="date-picker-input" >Date:</label>
-                    <input class="form-control" type="date" id="date-picker-input">
+                    <input class="form-control" type="date" id="date-picker-input" required>
+                    <div class="invalid-feedback">
+                        Please choose a valid date between the possible range.
+                    </div>
 
                 </div>
                 <div class="solDate form-group col d-none" id="solDate">
                     <label for="sol-picker-input" >Sol:</label>
                     <input class="form-control" type="number" id="sol-picker-input" min="0" required disabled>
+                    <div class="invalid-feedback">
+                        Please choose a valid number between the possible range.
+                    </div>
 
                 </div>
             </div>
@@ -84,6 +90,9 @@
                 <select class="form-control" id="rover-select" required >
                     <option value="">Choose a rover</option>
                 </select>
+                <div class="invalid-feedback">
+                    You must choose a rover to continue.
+                </div>
             </div>
 
             <div class="row mb-2">
@@ -91,6 +100,9 @@
                 <select class="form-control" id="camera-select" required disabled>
                     <option value="">Please select a rover first.</option>
                 </select>
+                <div class="invalid-feedback">
+                    You must choose a camera to continue.
+                </div>
             </div>
             <button class="btn btn-info me-2" type="button" id="search-Button">Search</button>
             <button class="btn btn-info me-2" type="button" id="clear-Button">clear</button>
@@ -106,6 +118,12 @@
     </div>
     <div class="row mb-3" id="images-container">
 
+    </div>
+
+    <div class="alert alert-warning d-flex align-items-center d-none" role="alert" id="empty-array-alert">
+        <div>
+            Sorry, there were no photos for selected camera.
+        </div>
     </div>
 
 

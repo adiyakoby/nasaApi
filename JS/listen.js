@@ -18,23 +18,20 @@
         const SearchButton = document.getElementById("search-Button");
         const ClearButton = document.getElementById("clear-Button");
         const roverSelection = document.getElementById("rover-select");
-
-        //images container
-        const imagesContainer = document.getElementById("images-container");
+        const cameraSelection = document.getElementById("camera-select");
 
 
-
-        apiManager.init();
+        apiManager.init();  // fetch the rover once from the server.
 
         // Event listeners
         dateFormat.addEventListener("change", function () {
             htmlManager.addDateFormat();
         });
 
-
-        SolSelection.addEventListener("change", function () {
-            htmlManager.checkDate();
-        });
+        //
+        // SolSelection.addEventListener("change", function () {
+        //     htmlManager.checkDate();
+        // });
 
         roverSelection.addEventListener("change", function () {
             htmlManager.addCameras();
@@ -42,9 +39,9 @@
         });
 
         // cameraSelection.addEventListener("click", function () {
-        //
+        //     htmlManager.inValidElements();
         // });
-        //
+
 
         SearchButton.addEventListener("click" , function () {
             htmlManager.getImages();
