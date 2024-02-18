@@ -6,8 +6,11 @@ const htmlManager= (function (qualifiedName, value) {
     const imagesArray = []
 
     //DOM elements
-    const dateFormat = document.getElementById("date-format");
+    const homePage = document.getElementById("home-page");
+    const savedImagesPage = document.getElementById("saved-images-page");
 
+    const NasaForm = document.getElementById("nasaForm");
+    const dateFormat = document.getElementById("date-format");
     const DateSelection = document.getElementById("earthDate");
     const DateSelectionInput = document.getElementById("date-picker-input");
     const SolSelection = document.getElementById("solDate");
@@ -17,10 +20,10 @@ const htmlManager= (function (qualifiedName, value) {
     const roverSelection = document.getElementById("rover-select");
     const cameraSelection = document.getElementById("camera-select");
 
-
-    const NasaForm = document.getElementById("nasaForm");
     const imagesContainer = document.getElementById("images-container");
     const emptyArrayAlert = document.getElementById("empty-array-alert");
+
+
 
     //default string
     const cameraSelectionMessage  = '<option value="">Please select a rover first.</option>';
@@ -83,12 +86,12 @@ const htmlManager= (function (qualifiedName, value) {
      * Toggles visibility and enables/disables input elements based on Earth or Martian Sol date selection.
      *
      * @function
-     * @name addDateFormat
+     * @name updateDateFormat
      * @description This function is designed to toggle the visibility and disable/enable input elements
      * based on whether the Earth date or Martian Sol date is selected.
      *
      */
-    const addDateFormat = function () {
+    const updateDateFormat = function () {
         const earthSelected = dateFormat.value === earthDateSelection; // Check if Earth date is selected
 
         DateSelection.classList.toggle("d-none", !earthSelected);
@@ -111,6 +114,10 @@ const htmlManager= (function (qualifiedName, value) {
 
 
     const getImages = function () {
+        spinnerToggle();
+        emptyArrayAlert.classList.add("d-none");
+
+
         try{
             if(validation.isFormValid(NasaForm) && checkDate()) {
                 const rover = {
@@ -123,20 +130,24 @@ const htmlManager= (function (qualifiedName, value) {
 
                 apiManager.fetchImages(rover)
                     .then(showImages)
+            } else {
+                spinnerToggle();
             }
         } catch (error) {
             console.log("Error fetching data:", error);
+            clearForm();
         }
         finally
         {
             inValidElements();
+
         }
 
     };
 
     const clearForm = function () {
         NasaForm.reset();
-        addDateFormat();
+        updateDateFormat();
         emptyArrayAlert.classList.add("d-none");
         Array.from(NasaForm.elements).forEach(e=>e.classList.remove("is-invalid"));
 
@@ -152,23 +163,18 @@ const htmlManager= (function (qualifiedName, value) {
         } else {
             emptyArrayAlert.classList.remove("d-none");
         }
-
+        spinnerToggle();
     };
     
     const createNewImage = function (img) {
-
         const src = img.img_src;
-
-        // Create the main container div with class "card" and style
         const cardDiv = document.createElement('div');
         cardDiv.className = 'card col-md-4';
         //cardDiv.style.width = '18rem';
 
-        // Create the image element with class "card-img-top"
         const imgElement = document.createElement('img');
-        Object.assign(imgElement, { src: src, className: 'card-img-top', alt: 'nasaPhoto' });
+        Object.assign(imgElement, { src: src, className: 'card-img-top', alt: 'nasaPhoto' , id:`${img.id}`});
 
-        // Create the div with class "card-body"
         const cardBodyDiv = document.createElement('div');
         cardBodyDiv.className = 'card-body';
 
@@ -189,15 +195,22 @@ const htmlManager= (function (qualifiedName, value) {
 
     };
 
+
+    const showHome = () => { homePage.classList.remove("d-none") };
+    const showSavedImages = () => { homePage.classList.add("d-none") };
+
     return {
         registerRovers : registerRovers,
         addCameras : addCameras,
         clearForm : clearForm,
-        addDateFormat : addDateFormat,
+        updateDateFormat : updateDateFormat,
         updateDates : updateDates,
         getImages : getImages,
         createNewImage : createNewImage,
-        inValidElements: inValidElements,
+        inValidElements : inValidElements,
+        showHome : showHome,
+        showSavedImages : showSavedImages,
+
 
 
 

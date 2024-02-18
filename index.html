@@ -14,16 +14,13 @@
         <h5 class ="text-center text-light">Browse NASA Mars images and create carousel</h5>
 
     </div>
-
-
 </div>
 <div>
-
     <nav class="navbar bg-primary-subtle">
         <form class="container-fluid justify-content-start">
             <img src="images/nasa-img.png" class="img-fluid me-2"  alt="space_image"/>
-            <button class="btn btn-outline-secondary me-2" type="button" id="home-page">Home</button>
-            <button class="btn btn-outline-secondary me-2" type="button" id="saved-images">Saved Images</button>
+            <button class="btn btn-outline-secondary me-2" type="button" id="home-button">Home</button>
+            <button class="btn btn-outline-secondary me-2" type="button" id="saved-images-button">Saved Images</button>
             <button class="btn btn-outline-secondary me-2" type="button" data-bs-toggle="modal"  data-bs-target="#myModal">Who am i</button>
         </form>
 
@@ -54,75 +51,77 @@
 </div>
 
 <div class="container-fluid p-5">
+    <div id="home-page">
+        <h2>Search for images:</h2>
+        <h6>First select a date format then a date and a rover. Select a camera (optional) and hit search. Then add images to
+            your preferred list. Browse your preferred list, remove images, start or stop a carousel.</h6>
+        <div>
+            <form class="form-group mb-3 " id="nasaForm">
+                <div class="row mb-2">
+                    <div class="form-group col">
+                        <label for="date-format">Select a date format:</label><br>
+                        <select class="form-control" id="date-format" required>
+                            <option value="earth_date">Earth Date</option>
+                            <option value="sol">Mars Date (Sol)</option>
+                        </select>
+                    </div>
+                    <div class="earthDate form-group col" id="earthDate" >
+                        <label for="date-picker-input" >Date:</label>
+                        <input class="form-control" type="date" id="date-picker-input" required>
+                        <div class="invalid-feedback">
+                            Please choose a valid date between the possible range.
+                        </div>
 
-    <h2>Search for images:</h2>
-    <h6>First select a date format then a date and a rover. Select a camera (optional) and hit search. Then add images to
-        your preferred list. Browse your preferred list, remove images, start or stop a carousel.</h6>
-    <div>
-        <form class="form-group mb-3 " id="nasaForm">
-            <div class="row mb-2">
-                <div class="form-group col">
-                    <label for="date-format">Select a date format:</label><br>
-                    <select class="form-control" id="date-format" required>
-                        <option value="earth_date">Earth Date</option>
-                        <option value="sol">Mars Date (Sol)</option>
+                    </div>
+                    <div class="solDate form-group col d-none" id="solDate">
+                        <label for="sol-picker-input" >Sol:</label>
+                        <input class="form-control" type="number" id="sol-picker-input" min="0" required disabled>
+                        <div class="invalid-feedback">
+                            Please choose a valid number between the possible range.
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <label for="rover-select">Select a rover:</label>
+                    <select class="form-control" id="rover-select" required >
+                        <option value="">Choose a rover</option>
                     </select>
-                </div>
-                <div class="earthDate form-group col" id="earthDate" >
-                    <label for="date-picker-input" >Date:</label>
-                    <input class="form-control" type="date" id="date-picker-input" required>
                     <div class="invalid-feedback">
-                        Please choose a valid date between the possible range.
+                        You must choose a rover to continue.
                     </div>
-
                 </div>
-                <div class="solDate form-group col d-none" id="solDate">
-                    <label for="sol-picker-input" >Sol:</label>
-                    <input class="form-control" type="number" id="sol-picker-input" min="0" required disabled>
+
+                <div class="row mb-2">
+                    <label for="camera-select">Select a camera:</label>
+                    <select class="form-control" id="camera-select" required disabled>
+                        <option value="">Please select a rover first.</option>
+                    </select>
                     <div class="invalid-feedback">
-                        Please choose a valid number between the possible range.
+                        You must choose a camera to continue.
                     </div>
-
                 </div>
-            </div>
-            <div class="row mb-2">
-                <label for="rover-select">Select a rover:</label>
-                <select class="form-control" id="rover-select" required >
-                    <option value="">Choose a rover</option>
-                </select>
-                <div class="invalid-feedback">
-                    You must choose a rover to continue.
+                <button class="btn btn-info me-2" type="button" id="search-Button">Search</button>
+                <button class="btn btn-info me-2" type="button" id="clear-Button">clear</button>
+            </form>
+            <div class="d-flex justify-content-center caption-overlay position-absolute justify-content-center align-items-center top-0 start-0 w-100 h-100" id="spinner-loader">
+                <div class="spinner-border"  style="width: 5rem; height: 5rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
                 </div>
-            </div>
-
-            <div class="row mb-2">
-                <label for="camera-select">Select a camera:</label>
-                <select class="form-control" id="camera-select" required disabled>
-                    <option value="">Please select a rover first.</option>
-                </select>
-                <div class="invalid-feedback">
-                    You must choose a camera to continue.
-                </div>
-            </div>
-            <button class="btn btn-info me-2" type="button" id="search-Button">Search</button>
-            <button class="btn btn-info me-2" type="button" id="clear-Button">clear</button>
-        </form>
-        <div class="d-flex justify-content-center caption-overlay position-absolute justify-content-center align-items-center top-0 start-0 w-100 h-100" id="spinner-loader">
-            <div class="spinner-border"  style="width: 5rem; height: 5rem;" role="status">
-                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
+        <div class="row mb-3">
+            <h2>Search results:</h2>
+        </div>
+        <div class="row mb-3" id="images-container">
+        </div>
     </div>
-    <div class="row mb-3">
-        <h2>Search results:</h2>
-    </div>
-    <div class="row mb-3" id="images-container">
+    <div id="saved-images-page">
 
     </div>
-
     <div class="alert alert-warning d-flex align-items-center d-none" role="alert" id="empty-array-alert">
         <div>
-            Sorry, there were no photos for selected camera.
+            Sorry, there was no photos. try changing cameras or date.
         </div>
     </div>
 
