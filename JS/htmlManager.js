@@ -3,7 +3,6 @@
 const htmlManager= (function (qualifiedName, value) {
     //Array for rovers and cameras
     const roversArray = []
-    const imagesArray = []
 
     //DOM elements
     const homePage = document.getElementById("home-page");
@@ -32,8 +31,7 @@ const htmlManager= (function (qualifiedName, value) {
     const cameraSelectionMessage  = '<option value="">Please select a rover first.</option>';
     const earthDateSelection = "earth_date";
     const marsDateSelection = "sol";
-    const toastSavedMessage = 'image saved into your preferred list.';
-    const toastNotSavedMessage = 'image was saved into your preferred list already, no duplicates allowed..'
+
 
     const registerRovers = function (res) {
         res["rovers"].forEach(rover => roversArray.push(rover))
@@ -122,7 +120,6 @@ const htmlManager= (function (qualifiedName, value) {
         spinnerToggle();
         emptyArrayAlert.classList.add("d-none");
 
-
         try{
             if(validation.isFormValid(NasaForm) && checkDate()) {
                 const rover = {
@@ -132,7 +129,6 @@ const htmlManager= (function (qualifiedName, value) {
                     "earth_date": DateSelectionInput.value,
                     "sol": SolSelectionInput.value
                 };
-
                 apiManager.fetchImages(rover)
                     .then(showImages)
             } else {
@@ -145,7 +141,6 @@ const htmlManager= (function (qualifiedName, value) {
         finally
         {
             inValidElements();
-
         }
 
     };
@@ -170,27 +165,30 @@ const htmlManager= (function (qualifiedName, value) {
         }
         spinnerToggle();
     };
-    
+
+    const cardBodyDivCreator = (date, sol, camera, rover, src) => {
+        return  `<p class="card-text">Earth date: ${date}</p>
+                  <p class="card-text">Sol: ${sol}</p>
+                  <p class="card-text">Camera: ${camera}</p>
+                  <p class="card-text">Mission: ${rover}</p>
+                  <a href=#" class="btn btn-primary" onclick="imagesBank.saveImage(this.parentNode.parentNode)">Save</a>
+                  <a href="${src}" class="btn btn-primary" target="_blank">Full size</a>`;
+    };
+
     const createNewImage = function (img) {
-        const src = img.img_src;
+
         const cardDiv = document.createElement('div');
         cardDiv.className = 'card col-md-4';
         cardDiv.style.width = '18rem';
 
         const imgElement = document.createElement('img');
-        Object.assign(imgElement, { src: src, className: 'card-img-top', alt: 'nasaPhoto' , id:`${img.id}`});
+        Object.assign(imgElement, { src: img.img_src, className: 'card-img-top', alt: 'nasaPhoto' , id:`${img.id}`});
 
         const cardBodyDiv = document.createElement('div');
         cardBodyDiv.className = 'card-body';
 
         // Create and append elements using a template literal
-        cardBodyDiv.innerHTML = `
-          <p class="card-text">Earth date: ${img.earth_date}</p>
-          <p class="card-text">Sol: ${img.sol}</p>
-          <p class="card-text">Camera: ${img.camera.name}</p>
-          <p class="card-text">Mission: ${img.rover.name}</p>
-          <a href=#" class="btn btn-primary" onclick="htmlManager.saveImage(this.parentNode.parentNode)">Save</a>
-          <a href="${src}" class="btn btn-primary" target="_blank">Full size</a>`;
+        cardBodyDiv.innerHTML = cardBodyDivCreator(img.earth_date, img.sol, img.camera.name, img.rover.name, img.img_src);
 
         // Append the elements to the appropriate parent elements
         cardDiv.appendChild(imgElement);
@@ -199,7 +197,6 @@ const htmlManager= (function (qualifiedName, value) {
         imagesContainer.appendChild(cardDiv);
 
     };
-
 
     const toastBodyCreator = (header, msg) => {
         return `<div class="toast-header">
@@ -212,25 +209,12 @@ const htmlManager= (function (qualifiedName, value) {
                 </div>`
     };
 
-    const saveImage = function (newImage) {
-        let header = ''
-        let msg = ''
-        if(imagesArray.every(img => img !== newImage)){
-            console.log("added new img")
-            imagesArray.push(newImage);
-            header = "Saved";
-            msg = toastSavedMessage;
 
-
-        } else {
-            header = "Not saved";
-            msg = toastNotSavedMessage;
-        }
-
+    const showToast = (header, msg) => {
         toastLiveExample.innerHTML = toastBodyCreator(header, msg);
         const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);
         toastBootstrap.show();
-    }
+    };
 
 
     const showHome = () => { homePage.classList.remove("d-none") };
@@ -247,7 +231,7 @@ const htmlManager= (function (qualifiedName, value) {
         inValidElements : inValidElements,
         showHome : showHome,
         showSavedImages : showSavedImages,
-        saveImage : saveImage,
+        showToast : showToast,
 
     }
 
