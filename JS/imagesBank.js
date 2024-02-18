@@ -10,12 +10,12 @@ const imagesBank = (function () {
     const saveImage = function (newImage) {
         let header = ''
         let msg = ''
+
         if(imagesArray.every(img => img !== newImage)){
-            console.log("added new img")
             imagesArray.push(newImage);
+            htmlManager.addImage(newImage);
             header = "Saved";
             msg = toastSavedMessage;
-
 
         } else {
             header = "Not saved";
@@ -23,13 +23,16 @@ const imagesBank = (function () {
         }
 
         htmlManager.showToast(header, msg);
-    }
+    };
+
+    const getImages = () => { return [...imagesArray]; };
 
 
     return {
         saveImage : saveImage,
+        getImages : getImages,
 
+        };
 
-    }
 
 })();

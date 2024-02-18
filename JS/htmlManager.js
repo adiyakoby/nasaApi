@@ -199,12 +199,13 @@ const htmlManager= (function (qualifiedName, value) {
     };
 
     const toastBodyCreator = (header, msg) => {
-        return `<div class="toast-header">
+        let success = header.toLowerCase() === "saved" ? 'success' : 'danger';
+        return `<div class="toast-header text-bg-${success}">
                 <strong class="me-auto">${header}</strong>
                 <small>Now</small>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-                <div class="toast-body">
+                <div class="toast-body ">
                     ${msg}
                 </div>`
     };
@@ -216,9 +217,59 @@ const htmlManager= (function (qualifiedName, value) {
         toastBootstrap.show();
     };
 
+    function extractCardInfo(cardElement) {
+        // Extracting information from the card element
+        let earthDate = cardElement.getElementsByClassName('card-text')[0].innerText;
+        let sol = cardElement.getElementsByClassName('card-text')[1].innerText;
+        let camera = cardElement.getElementsByClassName('card-text')[2].innerText;
+        let id = cardElement.getElementsByTagName('img')[0].id;
+        let src = cardElement.getElementsByTagName('img')[0].src;
 
-    const showHome = () => { homePage.classList.remove("d-none") };
-    const showSavedImages = () => { homePage.classList.add("d-none") };
+        // Returning the extracted information
+        return {
+            earth_date: earthDate,
+            sol: sol,
+            camera: camera,
+            id: id,
+            src: src
+        };
+    }
+    const cardBodySavedImagesCreator = function (imageData) {
+        return `<div class="row g-0">
+                <div class="col-md-4">
+                    <img src="${imageData.src}" class="img-fluid rounded-start" alt="nasa-image"> 
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <p class="card-text">${imageData.earth_date}, ${imageData.sol}<br>${imageData.camera}, id: ${imageData.id}</p>
+                        <button class="btn btn-danger col-6" onclick="">delete</button>
+                    </div>
+                
+                    </div>
+                </div>`;
+    }
+
+    const addImage = function (image) {
+        const imageData = extractCardInfo(image);
+        //savedImagesPage.appendChild();
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card mb-3';
+        cardDiv.style.maxWidth = '540px';
+
+        cardDiv.innerHTML = cardBodySavedImagesCreator(imageData);
+        savedImagesPage.appendChild(cardDiv);
+
+    };
+
+
+    const showHome = () => {
+        homePage.classList.remove("d-none")
+        savedImagesPage.classList.add("d-none")
+    };
+    const showSavedImages = () => {
+        homePage.classList.add("d-none");
+        savedImagesPage.classList.remove("d-none");
+    };
 
     return {
         registerRovers : registerRovers,
@@ -232,6 +283,7 @@ const htmlManager= (function (qualifiedName, value) {
         showHome : showHome,
         showSavedImages : showSavedImages,
         showToast : showToast,
+        addImage : addImage,
 
     }
 
