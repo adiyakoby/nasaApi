@@ -25,13 +25,6 @@ const validation = (function () {
 
 
     const isInvalidElement  = (element) => {
-        // const cond = !(element.hasAttribute("required") &&
-        //                         !(element.parentNode.classList.contains("d-none")) &&
-        //                           element.value.trim() === '');
-        //
-        // if(!cond) htmlManager.inValidElement(element);
-        // return cond;
-
        return !(element.hasAttribute("required") &&
                 !(element.parentNode.classList.contains("d-none")) &&
                 element.value.trim() === '');
