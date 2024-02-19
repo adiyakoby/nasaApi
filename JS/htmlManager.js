@@ -163,12 +163,10 @@ const htmlManager= (function () {
                 };
                 apiManager.fetchImages(rover)
                     .then(showImages);
-                emptyArrayAlert.classList.add("d-none");
-
             } else {
                 spinnerToggle();
-                emptyArrayAlert.classList.add("d-none");
             }
+            emptyArrayAlert.classList.add("d-none");
         } catch (e) {
             console.log(ErrorMessage, e);
             showToast(Error , ErrorMessage + e.message);
