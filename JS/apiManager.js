@@ -61,7 +61,7 @@ const apiManager = (function () {
      */
     const fetchImages = async (obj) => {
         try {
-            const url = `${NASA_URL}/${obj.roverName}/photos?api_key=${API_KEY}&${obj.dateFormat}=${obj[obj.dateFormat]}&camera=${obj.camera}`;
+            const url = `${NASA_URL}/${obj.roverName}/photos?api_key=${API_KEY}&${obj.dateFormat}=${obj[obj.dateFormat]}&camera=${obj.camera}&page=1`;
             const data = await fetchData(url);
             return Promise.resolve(data);
         } catch (e) {
