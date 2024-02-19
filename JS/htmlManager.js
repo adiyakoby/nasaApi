@@ -33,6 +33,10 @@ const htmlManager= (function (qualifiedName, value) {
     const earthDateSelection = "earth_date";
     const marsDateSelection = "sol";
 
+    //const vars and messages.
+    const Error = "Error!"
+    const ErrorMessage = "Error fetching data:"
+
 
     const spinnerToggle = function () {
         spinnerLoader.classList.toggle("d-none");
@@ -139,8 +143,9 @@ const htmlManager= (function (qualifiedName, value) {
             } else {
                 spinnerToggle();
             }
-        } catch (error) {
-            console.log("Error fetching data:", error);
+        } catch (e) {
+            console.log(ErrorMessage, e);
+            showToast(Error , ErrorMessage + e.message);
             clearForm();
         }
         finally
@@ -166,8 +171,9 @@ const htmlManager= (function (qualifiedName, value) {
             } else {
                 emptyArrayAlert.classList.remove("d-none");
             }
-        } catch (error) {
-            console.log("Error fetching images:", error);
+        } catch (e) {
+            console.log(ErrorMessage, e);
+            showToast(Error , ErrorMessage + e.message);
         }
         spinnerToggle();
     };
@@ -266,8 +272,8 @@ const htmlManager= (function (qualifiedName, value) {
             imgDiv.appendChild(imgElement);
             return imgDiv;
         });
-
-        imgElements[0].className = "carousel-item active"  //start the first one
+        if(imgElements.length>0)
+            imgElements[0].className = "carousel-item active"  //start the first one
         // Append all the created elements to the carouselInner container
         imgElements.forEach(imgElement => carouselInner.appendChild(imgElement));
 

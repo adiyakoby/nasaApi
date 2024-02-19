@@ -5,13 +5,18 @@ const apiManager = (function () {
     //const API_KEY = "ACsJrPYqG2NleSki1rWH1DjyKtqkxd7prMqy68D5" // MY
     const NASA_URL = "https://api.nasa.gov/mars-photos/api/v1/rovers"
 
+    //const vars and messages.
+    const Error = "Error!"
+    const ErrorMessage = "Error fetching data:"
+
     const fetchData = async (url) => {
         try {
             const response = await fetch(url);
             await validation.statusCheck(response);
             return response.json();
-        } catch (error) {
-            console.log("Error fetching data:", error);
+        } catch (e) {
+            console.log(ErrorMessage, e);
+            htmlManager.showToast(Error, e.message);
         }
     };
 
@@ -26,7 +31,8 @@ const apiManager = (function () {
             }
         }
         catch (e) {
-            console.log("Error fetching data:", e);
+            console.log(ErrorMessage, e);
+            htmlManager.showToast(Error, e.message);
         }
     };
 
@@ -36,7 +42,8 @@ const apiManager = (function () {
             const data = await fetchData(url);
             return Promise.resolve(data);
         } catch (e) {
-            console.log("Error fetching data:", e);
+            console.log(ErrorMessage, e);
+            htmlManager.showToast(Error, e.message);
         }
 
     };
