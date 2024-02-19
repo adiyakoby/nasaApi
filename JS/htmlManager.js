@@ -1,26 +1,27 @@
 "use strict";
 
-const htmlManager= (function (qualifiedName, value) {
+/**
+ * The `htmlManager` module is responsible for managing the HTML elements and interactions within the application.
+ * It handles DOM manipulation, form updates, image rendering, and displays.
+ * @module htmlManager
+ */
+const htmlManager= (function () {
 
     //DOM elements
     const homePage = document.getElementById("home-page");
     const savedImagesPage = document.getElementById("saved-images-page");
-
     const NasaForm = document.getElementById("nasaForm");
     const dateFormat = document.getElementById("date-format");
     const DateSelection = document.getElementById("earthDate");
     const DateSelectionInput = document.getElementById("date-picker-input");
     const SolSelection = document.getElementById("solDate");
     const SolSelectionInput = document.getElementById("sol-picker-input");
-
     const spinnerLoader = document.getElementById("spinner-loader");
     const roverSelection = document.getElementById("rover-select");
     const cameraSelection = document.getElementById("camera-select");
-
     const imagesContainer = document.getElementById("images-container");
     const savedImagesContainer = document.getElementById("saved-images-container");
     const emptyArrayAlert = document.getElementById("empty-array-alert");
-
     const toastLiveExample = document.getElementById('liveToast');
     const carouselInner = document.getElementById('carousel-Images');
     const carouselDiv = document.getElementById("nasaCarouselImages");
@@ -28,20 +29,27 @@ const htmlManager= (function (qualifiedName, value) {
 
 
 
-    //default string
+    // Default strings and constants
     const cameraSelectionMessage  = '<option value="">Please select a rover first.</option>';
     const earthDateSelection = "earth_date";
     const marsDateSelection = "sol";
-
     //const vars and messages.
     const Error = "Error!"
     const ErrorMessage = "Error fetching data:"
 
-
+    /**
+     * Toggles the visibility of the spinner loader.
+     * @private
+     */
     const spinnerToggle = function () {
         spinnerLoader.classList.toggle("d-none");
     };
 
+    /**
+     * Adds rover options to the rover selection dropdown based on the provided array of rovers.
+     * @param {Array} roversArr - An array of rover objects.
+     * @private
+     */
     const addRovers = function (roversArr) {
         roversArr.forEach((rover)=> {
             const newRover = document.createElement("option");
@@ -51,14 +59,26 @@ const htmlManager= (function (qualifiedName, value) {
         spinnerToggle();
     };
 
+    /**
+     * Returns the selected rover object from the rovers bank.
+     * @returns {Object} - The selected rover object.
+     * @private
+     */
     const selectedRover = () => roversBank.getRovers().find(rover => rover.name === roverSelection.value);
 
+    /**
+     * Marks invalid form elements by adding the "is-invalid" class. -> shows errors.
+     * @private
+     */
     const inValidElements = () => Array.from(NasaForm.elements).forEach(element => {
         if(element.value === '') element.classList.add("is-invalid")
         else if(element.type !== "date" && element.type !== "number") element.classList.remove("is-invalid");
     });
 
-
+    /**
+     * Adds camera options to the camera selection dropdown based on the selected rover's cameras.
+     * @private
+     */
     const addCameras = function () {
         cameraSelection.disabled = false; //let the user choose a camera
         cameraSelection.innerHTML = cameraSelectionMessage; // default string.
@@ -73,7 +93,9 @@ const htmlManager= (function (qualifiedName, value) {
         }
     };
 
-
+    /**
+     * Updates the date inputs based on the selected rover's landing date and mission duration.
+     */
     const updateDates = function () {
         const rover = selectedRover();
         if(rover) {
@@ -84,15 +106,10 @@ const htmlManager= (function (qualifiedName, value) {
         }
     };
 
-
     /**
      * Toggles visibility and enables/disables input elements based on Earth or Martian Sol date selection.
-     *
-     * @function
-     * @name updateDateFormat
      * @description This function is designed to toggle the visibility and disable/enable input elements
      * based on whether the Earth date or Martian Sol date is selected.
-     *
      */
     const updateDateFormat = function () {
         const earthSelected = dateFormat.value === earthDateSelection; // Check if Earth date is selected
@@ -106,6 +123,11 @@ const htmlManager= (function (qualifiedName, value) {
         SolSelectionInput.classList.remove("is-invalid");
     };
 
+    /**
+     * Checks the selected date input for validity. sol or earth_date.
+     * @returns {boolean} - True if the date is valid, otherwise false.
+     * @private
+     */
     const checkDate = function () {
 
         if(dateFormat.value === earthDateSelection && !validation.isEarthDateValid(DateSelectionInput.value, DateSelectionInput.min, DateSelectionInput.max)) {
@@ -123,6 +145,9 @@ const htmlManager= (function (qualifiedName, value) {
     };
 
 
+    /**
+     * Initiates the process to retrieve and display images based on user input.
+     */
     const getImages = function () {
         spinnerToggle();
         imagesContainer.innerHTML = '';
@@ -148,13 +173,15 @@ const htmlManager= (function (qualifiedName, value) {
             showToast(Error , ErrorMessage + e.message);
             clearForm();
         }
-        finally
-        {
+        finally {
             inValidElements();
         }
 
     };
 
+    /**
+     * Clears the form content and resets the validation state.
+     */
     const clearForm = function () {
         NasaForm.reset();
         updateDateFormat();
@@ -164,6 +191,10 @@ const htmlManager= (function (qualifiedName, value) {
     };
 
 
+    /**
+     * Renders images on the page based on the provided response.
+     * @param {object} res - The response object containing image data.
+     */
     const showImages = function (res) {
         try {
             if(imagesBank.registerImages(res)) {
@@ -178,6 +209,7 @@ const htmlManager= (function (qualifiedName, value) {
         spinnerToggle();
     };
 
+
     const cardBodyDivCreator = (date, sol, camera, mission, src) => {
         return  `
           <p class="card-text">Earth date: ${date}</p>
@@ -188,6 +220,10 @@ const htmlManager= (function (qualifiedName, value) {
           <a href="${src}" class="btn btn-primary" target="_blank">Full size</a>`;
     };
 
+    /**
+     * Creates a card div for displaying image details.
+     * @param {object} img - The image object containing details like earth_date, sol, camera, mission, and src.
+     */
     const createDivImage = function (img) {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'card col-md-4';
@@ -210,6 +246,12 @@ const htmlManager= (function (qualifiedName, value) {
 
     };
 
+    /**
+     * Creates a toast notification body.
+     * @param {string} header - The header text for the toast notification.
+     * @param {string} msg - The message text for the toast notification.
+     * @returns {string} - The HTML string for the toast body.
+     */
     const toastBodyCreator = (header, msg) => {
         let success = header.toLowerCase() === "saved" ? 'success' : 'danger';
         return `<div class="toast-header text-bg-${success}">
@@ -222,14 +264,22 @@ const htmlManager= (function (qualifiedName, value) {
                 </div>`
     };
 
-
+    /**
+     * Displays a toast notification with the specified header and message.
+     * @param {string} header - The header text for the toast notification.
+     * @param {string} msg - The message text for the toast notification.
+     */
     const showToast = (header, msg) => {
         toastLiveExample.innerHTML = toastBodyCreator(header, msg);
         const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);
         toastBootstrap.show();
     };
 
-
+    /**
+     * Creates the HTML content for the card body of a saved image, including details like earth_date, sol, camera, id, and src.
+     * @param {Object} img - The saved image object containing details like earth_date, sol, camera, id, and src.
+     * @returns {string} - The HTML content for the card body.
+     */
     const cardBodySavedImagesCreator = function (img) {
         return `<div class="row g-0">
                     <div class="col-md-4">
@@ -244,6 +294,10 @@ const htmlManager= (function (qualifiedName, value) {
                 </div>`;
     }
 
+    /**
+     * Adds a saved image to the saved images container on the saved images page.
+     * @param {Object} img - The saved image object containing details like earth_date, sol, camera, id, and src.
+     */
     const addImage = function (img) {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'card col-md-4';
@@ -254,6 +308,9 @@ const htmlManager= (function (qualifiedName, value) {
 
     };
 
+    /**
+     * Adds saved images to the image carousel.
+     */
     const addImagesToCarousel = function () {
         const savedImages = imagesBank.getSavedImages();
 
@@ -279,23 +336,41 @@ const htmlManager= (function (qualifiedName, value) {
 
     };
 
+    /**
+     * Shows the home page and hides the saved images page.
+     */
     const showHome = () => {
         homePage.classList.remove("d-none")
         savedImagesPage.classList.add("d-none")
     };
+
+    /**
+     * Shows the saved images page and hides the home page.
+     */
     const showSavedImagesPage = () => {
         homePage.classList.add("d-none");
         savedImagesPage.classList.remove("d-none");
     };
-    
+
+    /**
+     * Renders saved images on the saved images page.
+     */
     const renderSavedImages = function () {
         savedImagesContainer.innerHTML = "";
         imagesBank.getSavedImages().forEach(img => addImage(img));
     }
 
-    const startCarousel = () => { if(imagesBank.getSavedImages().length > 0) carouselDiv.classList.remove("d-none"); }
+    /**
+     * Starts the image carousel if there are saved images.
+     */
+    const startCarousel = () => {if(imagesBank.getSavedImages().length > 0) carouselDiv.classList.remove("d-none");}
+
+    /**
+     * Stops the image carousel.
+     */
     const stopCarousel = () => { carouselDiv.classList.add("d-none"); }
 
+    // Expose the public API for the `htmlManager` module
     return {
         addRovers: addRovers,
         addCameras : addCameras,
@@ -313,6 +388,6 @@ const htmlManager= (function (qualifiedName, value) {
         startCarousel : startCarousel,
         stopCarousel : stopCarousel,
 
-    }
+    };
 
 })();
