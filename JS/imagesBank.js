@@ -139,14 +139,14 @@ const imagesBank = (function () {
 
     /**
      * Erases a saved image from the list of saved images.
-     * @param {HTMLElement} img - The image element to erase.
+     * @param {HTMLElement} imgButton - The image element to erase.
      * @returns {void}
      * @function
      */
-    const eraseImage = function (img) {
-
+    const eraseImage = function (imgButton) {
+        console.log("inside eraseImage");
         const indexToDel = savedImagesArray.findIndex(function (image) {
-            return image.id === parseInt(img.dataset.imgId);
+            return image.id === parseInt(imgButton.dataset.imgId);
         });
 
         if(indexToDel !== -1) {

@@ -292,17 +292,20 @@ const htmlManager= (function () {
                         <img src="${img.src}" class="img-fluid rounded-start" alt="nasa-image"> 
                     </div>
                     <div class="col-md-8">
-                        <div class="card-body" data-img-id="${img.id}" data-img-src="${img.src}">
+                        <div class="card-body">
                             <p class="card-text" > earth_date: ${img.earth_date}, sol: ${img.sol}<br>camera: ${img.camera}, id: ${img.id}</p>
-                            <button class="btn btn-danger col-12" onclick="imagesBank.eraseImage(this.parentNode)">delete</button>
+                            <button class="btn btn-danger col-12 delete-btn" data-img-id="${img.id}">delete</button>
                         </div>
                     </div>
                 </div>`;
     }
 
     /**
-     * Adds a saved image to the saved images container on the saved images page.
-     * @param {Object} img - The saved image object containing details like earth_date, sol, camera, id, and src.
+     * Adds a NASA image to the list of saved images and renders it in the UI, also adds an event listener
+     * to the delete button.
+     * @param {Object} img - The NASA image object to add.
+     * @returns {void}
+     * @function
      */
     const addImage = function (img) {
         const cardDiv = document.createElement('div');
@@ -310,6 +313,12 @@ const htmlManager= (function () {
         cardDiv.style.maxWidth = '540px';
 
         cardDiv.innerHTML = cardBodySavedImagesCreator(img);
+
+        const deleteButton = cardDiv.querySelector('.delete-btn');
+
+        deleteButton.addEventListener('click', function () {
+            imagesBank.eraseImage(deleteButton);
+        });
         savedImagesContainer.appendChild(cardDiv);
 
     };
