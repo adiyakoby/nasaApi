@@ -210,14 +210,14 @@ const htmlManager= (function () {
     };
 
 
-    const cardBodyDivCreator = (date, sol, camera, mission, src) => {
+    const cardBodyDivCreator = (img) => {
         return  `
-          <p class="card-text">Earth date: ${date}</p>
-          <p class="card-text">Sol: ${sol}</p>
-          <p class="card-text">Camera: ${camera}</p>
-          <p class="card-text">Mission: ${mission}</p>
+          <p class="card-text">Earth date: ${img.earth_date}</p>
+          <p class="card-text">Sol: ${img.sol}</p>
+          <p class="card-text">Camera: ${img.camera}</p>
+          <p class="card-text">Mission: ${img.mission}</p>
           <a href=#" class="btn btn-primary" onclick="imagesBank.saveImage(this.nextElementSibling.getAttribute('href'))">Save</a>
-          <a href="${src}" class="btn btn-primary" target="_blank">Full size</a>`;
+          <a href="${img.src}" class="btn btn-primary" target="_blank">Full size</a>`;
     };
 
     /**
@@ -236,7 +236,7 @@ const htmlManager= (function () {
         cardBodyDiv.className = 'card-body';
 
         // Create and append elements using a template literal
-        cardBodyDiv.innerHTML = cardBodyDivCreator(img.earth_date, img.sol, img.camera, img.mission, img.src);
+        cardBodyDiv.innerHTML = cardBodyDivCreator(img);
 
         // Append the elements to the appropriate parent elements
         cardDiv.appendChild(imgElement);
