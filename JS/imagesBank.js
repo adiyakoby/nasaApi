@@ -113,11 +113,17 @@ const imagesBank = (function () {
     };
 
 
+    /**
+     * Saves a selected image to the list of saved images.
+     * @param {HTMLElement} newSelectedImage - The selected image element to save.
+     * @returns {void}
+     * @function
+     */
     const saveImage = function (newSelectedImage) {
 
         const newImage = imagesArray.find(image=> image.id===parseInt(newSelectedImage.dataset.imgId));
-        let header = ''
-        let msg = ''
+        let header = '';
+        let msg = '';
 
         if(savedImagesArray.every(img => img !== newImage)){
             savedImagesArray.push(newImage);

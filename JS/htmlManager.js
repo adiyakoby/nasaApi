@@ -209,7 +209,12 @@ const htmlManager= (function () {
         spinnerToggle();
     };
 
-
+    /**
+     * Creates the HTML content for the body of a card element representing a NASA image in the Home page.
+     * @param {Object} img - The NASA image object.
+     * @returns {string} - The HTML content for the card body.
+     * @function
+     */
     const cardBodyDivCreator = (img) => {
         return  `
           <p class="card-text">Earth date: ${img.earth_date}</p>
@@ -276,7 +281,8 @@ const htmlManager= (function () {
     };
 
     /**
-     * Creates the HTML content for the card body of a saved image, including details like earth_date, sol, camera, id, and src.
+     * Creates the HTML content for the card body of a saved image in the saved images page, including
+     * details like earth_date, sol, camera, id, and src.
      * @param {Object} img - The saved image object containing details like earth_date, sol, camera, id, and src.
      * @returns {string} - The HTML content for the card body.
      */
