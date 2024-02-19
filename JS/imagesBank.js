@@ -112,21 +112,15 @@ const imagesBank = (function () {
         return false;
     };
 
-    /**
-     * Saves an image to the list of saved images.
-     * @param {string} newImageSrc - The source URL of the new image.
-     * @returns {void}
-     * @function
-     */
-    const saveImage = function (newImageSrc) {
 
-        const newImage = imagesArray.find(img=> img.src===newImageSrc);
+    const saveImage = function (newSelectedImage) {
+
+        const newImage = imagesArray.find(image=> image.id===parseInt(newSelectedImage.dataset.imgId));
         let header = ''
         let msg = ''
 
         if(savedImagesArray.every(img => img !== newImage)){
             savedImagesArray.push(newImage);
-            //htmlManager.addImage(newImage);
             header = "Saved";
             msg = toastSavedMessage;
 
@@ -146,7 +140,7 @@ const imagesBank = (function () {
     const eraseImage = function (img) {
 
         const indexToDel = savedImagesArray.findIndex(function (image) {
-            return image.id === parseInt(img.dataset.imgId) && image.src === img.dataset.imgSrc;
+            return image.id === parseInt(img.dataset.imgId);
         });
 
         if(indexToDel !== -1) {

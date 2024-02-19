@@ -216,7 +216,7 @@ const htmlManager= (function () {
           <p class="card-text">Sol: ${img.sol}</p>
           <p class="card-text">Camera: ${img.camera}</p>
           <p class="card-text">Mission: ${img.mission}</p>
-          <a href=#" class="btn btn-primary" onclick="imagesBank.saveImage(this.nextElementSibling.getAttribute('href'))">Save</a>
+          <a href=#" class="btn btn-primary" data-img-id="${img.id}" onclick="imagesBank.saveImage(this)">Save</a>
           <a href="${img.src}" class="btn btn-primary" target="_blank">Full size</a>`;
     };
 
