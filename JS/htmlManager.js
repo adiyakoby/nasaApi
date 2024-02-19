@@ -167,6 +167,7 @@ const htmlManager= (function () {
 
             } else {
                 spinnerToggle();
+                emptyArrayAlert.classList.add("d-none");
             }
         } catch (e) {
             console.log(ErrorMessage, e);
