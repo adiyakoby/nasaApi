@@ -89,19 +89,18 @@ const imagesBank = (function () {
     const toastNotSavedMessage = 'image was saved into your preferred list already, no duplicates allowed..'
 
     /**
-     * Registers images by adding them to the internal imagesArray.
+     * Registers images by adding them to the internal homeImagesMap.
      * @param {Object} res - The response object containing image information.
      * @returns {boolean} - True if images were registered successfully, false otherwise.
      * @function
      */
     const registerImages = function (res) {
-        imagesArray.length = 0; //reset the array between new requests
-
+        homeImagesMap.clear(); //reset the map between new requests
         let length = res["photos"].length
+
         if(res && length > 0) {
-            let limit = (length > 50 ? 50 : length);
-            res["photos"].slice(0, limit).forEach(photo => {
-                imagesArray.push(new nasaImage(
+            res["photos"].forEach( photo => {
+                homeImagesMap.set(parseInt(photo.id), new nasaImage(
                     parseInt(photo.id),
                     photo.img_src,
                     photo.sol,
@@ -117,21 +116,20 @@ const imagesBank = (function () {
 
 
     /**
-     * Saves a selected image to the list of saved images.
+     * Saves a selected image to the map of saved images.
      * @param {HTMLElement} imgButton - The selected image element to save. *(save button element)*
      * @returns {void}
      * @function
      */
     const saveImage = function (imgButton) {
-        const newImage = imagesArray.find(image=> image.id===parseInt(imgButton.dataset.imgId));
-        //const imgId = imgButton.dataset.imgId;
+        //const newImage = imagesArray.find(image=> image.id===parseInt(imgButton.dataset.imgId));
+        const imgId = parseInt(imgButton.dataset.imgId);
 
         let header = '';
         let msg = '';
 
-        if(!savedImagesMap.has(parseInt(newImage.id))){
-            console.log(`added ${newImage.id} successfully`)
-            savedImagesMap.set(parseInt(newImage.id), newImage);
+        if(!savedImagesMap.has(imgId)){
+            savedImagesMap.set(imgId, homeImagesMap.get(imgId));
             header = "Saved";
             msg = toastSavedMessage;
         } else {
@@ -143,7 +141,7 @@ const imagesBank = (function () {
     };
 
     /**
-     * Erases a saved image from the list of saved images.
+     * Erases a saved image from the map of saved images.
      * @param {HTMLElement} imgButton - The image element to erase. *(delete button element)*
      * @returns {void}
      * @function
@@ -156,7 +154,6 @@ const imagesBank = (function () {
             savedImagesMap.delete(imgId);
             htmlManager.renderSavedImages();
         }
-
     };
 
     /**
@@ -164,7 +161,7 @@ const imagesBank = (function () {
      * @returns {Array<nasaImage>} - A copy of the array containing registered images.
      * @function
      */
-    const getImages = () => {return [...imagesArray]};
+    const getImages = () => {return Array.from(homeImagesMap.values())};
 
     /**
      * Retrieves a copy of the array containing saved images.
