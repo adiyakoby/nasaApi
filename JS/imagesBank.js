@@ -115,13 +115,13 @@ const imagesBank = (function () {
 
     /**
      * Saves a selected image to the list of saved images.
-     * @param {HTMLElement} newSelectedImage - The selected image element to save.
+     * @param {HTMLElement} imgButton - The selected image element to save. *(save button element)*
      * @returns {void}
      * @function
      */
-    const saveImage = function (newSelectedImage) {
+    const saveImage = function (imgButton) {
 
-        const newImage = imagesArray.find(image=> image.id===parseInt(newSelectedImage.dataset.imgId));
+        const newImage = imagesArray.find(image=> image.id===parseInt(imgButton.dataset.imgId));
         let header = '';
         let msg = '';
 
@@ -139,12 +139,12 @@ const imagesBank = (function () {
 
     /**
      * Erases a saved image from the list of saved images.
-     * @param {HTMLElement} imgButton - The image element to erase.
+     * @param {HTMLElement} imgButton - The image element to erase. *(delete button element)*
      * @returns {void}
      * @function
      */
     const eraseImage = function (imgButton) {
-        console.log("inside eraseImage");
+
         const indexToDel = savedImagesArray.findIndex(function (image) {
             return image.id === parseInt(imgButton.dataset.imgId);
         });

@@ -221,13 +221,16 @@ const htmlManager= (function () {
           <p class="card-text">Sol: ${img.sol}</p>
           <p class="card-text">Camera: ${img.camera}</p>
           <p class="card-text">Mission: ${img.mission}</p>
-          <a href=#" class="btn btn-primary" data-img-id="${img.id}" onclick="imagesBank.saveImage(this)">Save</a>
+          <a href=#" class="btn btn-primary save-btn" data-img-id="${img.id}"">Save</a>
           <a href="${img.src}" class="btn btn-primary" target="_blank">Full size</a>`;
     };
 
     /**
-     * Creates a card div for displaying image details.
-     * @param {object} img - The image object containing details like earth_date, sol, camera, mission, and src.
+     * Creates a card element representing a NASA image and appends it to the images container, also adds an event
+     * listene to the save button.
+     * @param {Object} img - The NASA image object to display.
+     * @returns {void}
+     * @function
      */
     const createDivImage = function (img) {
         const cardDiv = document.createElement('div');
@@ -242,6 +245,12 @@ const htmlManager= (function () {
 
         // Create and append elements using a template literal
         cardBodyDiv.innerHTML = cardBodyDivCreator(img);
+
+        const saveButton = cardBodyDiv.querySelector('.save-btn');
+
+        saveButton.addEventListener('click', function () {
+            imagesBank.saveImage(saveButton);
+        });
 
         // Append the elements to the appropriate parent elements
         cardDiv.appendChild(imgElement);
