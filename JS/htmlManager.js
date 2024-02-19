@@ -22,7 +22,8 @@ const htmlManager= (function (qualifiedName, value) {
     const emptyArrayAlert = document.getElementById("empty-array-alert");
 
     const toastLiveExample = document.getElementById('liveToast');
-    const carouselInner = document.getElementById('carousel-inner');
+    const carouselInner = document.getElementById('carousel-Images');
+    const carouselDiv = document.getElementById("nasaCarouselImages");
 
 
 
@@ -50,8 +51,7 @@ const htmlManager= (function (qualifiedName, value) {
 
     const inValidElements = () => Array.from(NasaForm.elements).forEach(element => {
         if(element.value === '') element.classList.add("is-invalid")
-        else if(element.type === "type" || element.type === "number") checkDate();
-        else element.classList.remove("is-invalid");
+        else if(element.type !== "date" && element.type !== "number") element.classList.remove("is-invalid");
     });
 
 
@@ -105,6 +105,7 @@ const htmlManager= (function (qualifiedName, value) {
     const checkDate = function () {
 
         if(dateFormat.value === earthDateSelection && !validation.isEarthDateValid(DateSelectionInput.value, DateSelectionInput.min, DateSelectionInput.max)) {
+            console.log("inside check date in earth -> returning false")
             DateSelectionInput.classList.add("is-invalid");
             return false;
 
@@ -120,7 +121,6 @@ const htmlManager= (function (qualifiedName, value) {
 
     const getImages = function () {
         spinnerToggle();
-        emptyArrayAlert.classList.add("d-none");
         imagesContainer.innerHTML = '';
 
         try{
@@ -133,11 +133,11 @@ const htmlManager= (function (qualifiedName, value) {
                     "sol": SolSelectionInput.value
                 };
                 apiManager.fetchImages(rover)
-                    .then(showImages)
+                    .then(showImages);
+                emptyArrayAlert.classList.add("d-none");
+
             } else {
                 spinnerToggle();
-                emptyArrayAlert.classList.remove("d-none");
-
             }
         } catch (error) {
             console.log("Error fetching data:", error);
@@ -249,18 +249,29 @@ const htmlManager= (function (qualifiedName, value) {
     };
 
     const addImagesToCarousel = function () {
-        imagesBank.getSavedImages().forEach(function (img) {
+        const savedImages = imagesBank.getSavedImages();
 
+        carouselInner.innerHTML = ""; //reset carousel
+
+        // Create an array of HTML elements for each saved image
+        const imgElements = savedImages.map(img => {
             const imgDiv = document.createElement("div");
             imgDiv.className = "carousel-item";
-            const imgElement = document.createElement('img');
-            Object.assign(imgElement, { src: img.src, className: 'd-block w-100', alt: 'nasaPhoto'});
-            imgDiv.appendChild(imgElement);
-            console.log(imgDiv);
-            carouselInner.appendChild(imgDiv);
-        })
-    }
 
+            const imgElement = document.createElement('img');
+            imgElement.src = img.src;
+            imgElement.className = 'd-block w-100';
+            imgElement.alt = 'nasaPhoto';
+
+            imgDiv.appendChild(imgElement);
+            return imgDiv;
+        });
+
+        imgElements[0].className = "carousel-item active"  //start the first one
+        // Append all the created elements to the carouselInner container
+        imgElements.forEach(imgElement => carouselInner.appendChild(imgElement));
+
+    };
 
     const showHome = () => {
         homePage.classList.remove("d-none")
@@ -276,6 +287,9 @@ const htmlManager= (function (qualifiedName, value) {
         imagesBank.getSavedImages().forEach(img => addImage(img));
     }
 
+    const startCarousel = () => { if(imagesBank.getSavedImages().length > 0) carouselDiv.classList.remove("d-none"); }
+    const stopCarousel = () => { carouselDiv.classList.add("d-none"); }
+
     return {
         addRovers: addRovers,
         addCameras : addCameras,
@@ -290,6 +304,8 @@ const htmlManager= (function (qualifiedName, value) {
         addImage : addImage,
         addImagesToCarousel : addImagesToCarousel,
         renderSavedImages: renderSavedImages,
+        startCarousel : startCarousel,
+        stopCarousel : stopCarousel,
 
     }
 

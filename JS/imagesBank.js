@@ -38,6 +38,8 @@ const imagesBank = (function () {
 
 
     const registerImages = function (res) {
+        imagesArray.length = 0; //reset the array between new requests
+
         let length = res["photos"].length
         if(res && length > 0) {
             let limit = (length > 50 ? 50 : length);
