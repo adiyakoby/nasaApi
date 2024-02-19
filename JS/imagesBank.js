@@ -77,6 +77,9 @@ const imagesBank = (function () {
         get mission() {return this.#mission};
     }
 
+    //Home Page and Saved Images Page containers.
+    const homeImagesMap = new Map()
+    const savedImagesMap = new Map()
 
     const imagesArray = []
     const savedImagesArray = []
@@ -120,21 +123,23 @@ const imagesBank = (function () {
      * @function
      */
     const saveImage = function (imgButton) {
-
         const newImage = imagesArray.find(image=> image.id===parseInt(imgButton.dataset.imgId));
+        //const imgId = imgButton.dataset.imgId;
+
         let header = '';
         let msg = '';
 
-        if(savedImagesArray.every(img => img !== newImage)){
-            savedImagesArray.push(newImage);
+        if(!savedImagesMap.has(parseInt(newImage.id))){
+            console.log(`added ${newImage.id} successfully`)
+            savedImagesMap.set(parseInt(newImage.id), newImage);
             header = "Saved";
             msg = toastSavedMessage;
-
         } else {
             header = "Not saved";
             msg = toastNotSavedMessage;
         }
         htmlManager.showToast(header, msg);
+
     };
 
     /**
@@ -145,14 +150,13 @@ const imagesBank = (function () {
      */
     const eraseImage = function (imgButton) {
 
-        const indexToDel = savedImagesArray.findIndex(function (image) {
-            return image.id === parseInt(imgButton.dataset.imgId);
-        });
+        const imgId = parseInt(imgButton.dataset.imgId);
 
-        if(indexToDel !== -1) {
-            savedImagesArray.splice(indexToDel, 1);
+        if(savedImagesMap.has(imgId)) {
+            savedImagesMap.delete(imgId);
             htmlManager.renderSavedImages();
         }
+
     };
 
     /**
@@ -167,7 +171,7 @@ const imagesBank = (function () {
      * @returns {Array<nasaImage>} - A copy of the array containing saved images.
      * @function
      */
-    const getSavedImages = () => {return [...savedImagesArray]};
+    const getSavedImages = () => {return Array.from(savedImagesMap.values())};
 
 
     return {
