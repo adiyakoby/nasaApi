@@ -81,9 +81,16 @@ const imagesBank = (function () {
     const homeImagesMap = new Map()
     const savedImagesMap = new Map()
 
+    //const Sizes
+    const MaxSavedImages = 50;
+
     //default string
+    const toastSavedHeader = "Saved";
+    const toastNotSavedHeader = "Not saved";
+    const toastMaxCapacityHeader = "Max capacity reached!";
     const toastSavedMessage = 'image saved into your preferred list.';
-    const toastNotSavedMessage = 'image was saved into your preferred list already, no duplicates allowed..'
+    const toastNotSavedMessage = 'image was saved into your preferred list already, no duplicates allowed..';
+    const toastMaxCapacityMessage = `cannot save more than ${MaxSavedImages} images, please delete images before saving.`;
 
     /**
      * Registers images by adding them to the internal homeImagesMap.
@@ -124,13 +131,13 @@ const imagesBank = (function () {
         let header = '';
         let msg = '';
 
-        if(!savedImagesMap.has(imgId)){
+        if(!savedImagesMap.has(imgId) && savedImagesMap.size < MaxSavedImages){
             savedImagesMap.set(imgId, homeImagesMap.get(imgId));
-            header = "Saved";
+            header = toastSavedHeader;
             msg = toastSavedMessage;
-        } else {
-            header = "Not saved";
-            msg = toastNotSavedMessage;
+        } else{
+            header = savedImagesMap.has(imgId) ? toastNotSavedHeader : toastMaxCapacityHeader ;
+            msg = savedImagesMap.has(imgId) ? toastNotSavedMessage : toastMaxCapacityMessage  ;
         }
         htmlManager.showToast(header, msg);
 
