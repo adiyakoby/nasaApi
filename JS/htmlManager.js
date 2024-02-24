@@ -79,17 +79,19 @@ const htmlManager= (function () {
      * Adds camera options to the camera selection dropdown based on the selected rover's cameras.
      * @private
      */
-    const addCameras = function () {
-        cameraSelection.disabled = false; //let the user choose a camera
+    const updateCameras = function () {
         cameraSelection.innerHTML = cameraSelectionMessage; // default string.
 
         if(selectedRover()) {
+            cameraSelection.disabled = false; //let the user choose a camera
             selectedRover()["cameras"].forEach((camera)=> {
                 const newCamera = document.createElement("option");
                 newCamera.value = camera.name;
                 newCamera.innerText = camera.full_name;
                 cameraSelection.appendChild(newCamera);
             });
+        } else {
+            cameraSelection.disabled = true; // no rover selected
         }
     };
 
@@ -186,6 +188,7 @@ const htmlManager= (function () {
         updateDateFormat();
         emptyArrayAlert.classList.add("d-none");
         Array.from(NasaForm.elements).forEach(e=>e.classList.remove("is-invalid"));
+        updateCameras();
 
     };
 
@@ -396,7 +399,7 @@ const htmlManager= (function () {
     // Expose the public API for the `htmlManager` module
     return {
         addRovers: addRovers,
-        addCameras : addCameras,
+        updateCameras : updateCameras,
         clearForm : clearForm,
         updateDateFormat : updateDateFormat,
         updateDates : updateDates,

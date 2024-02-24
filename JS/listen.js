@@ -47,7 +47,7 @@
          * Adds available cameras and updates dates in the HTML manager.
          */
         roverSelection.addEventListener("change", function () {
-            htmlManager.addCameras();
+            htmlManager.updateCameras();
             htmlManager.updateDates();
         });
 
