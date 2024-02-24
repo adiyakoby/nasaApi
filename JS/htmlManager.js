@@ -226,7 +226,7 @@ const htmlManager= (function () {
 
     /**
      * Creates a card element representing a NASA image and appends it to the images container, also adds an event
-     * listene to the save button.
+     * listener to the save button.
      * @param {Object} img - The NASA image object to display.
      * @returns {void}
      * @function

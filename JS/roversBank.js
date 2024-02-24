@@ -11,7 +11,7 @@ const roversBank = (function () {
 
     /**
      * Registers rovers by adding them to the internal roversArray.
-     * @param {Object} roverData - The response object containing rover information.
+     * @param {Object} res - The response object containing rover information.
      * @function
      */
     const registerRovers = function (res) {
@@ -21,7 +21,7 @@ const roversBank = (function () {
 
     /**
      * Retrieves a copy of the array containing registered rovers.
-     * @returns {Array<Rover>} - A copy of the array containing registered rovers.
+     * @returns {Array<roversArray>} - A copy of the array containing registered rovers.
      * @function
      */
     const getRovers = () => {

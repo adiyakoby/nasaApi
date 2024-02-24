@@ -12,6 +12,7 @@ const apiManager = (function () {
     const NASA_URL = "https://api.nasa.gov/mars-photos/api/v1/rovers"
 
     // Constants for error handling
+    const Pages = 1
     const Error = "Error!"
     const ErrorMessage = "Error fetching data:"
 
@@ -61,7 +62,7 @@ const apiManager = (function () {
      */
     const fetchImages = async (obj) => {
         try {
-            const url = `${NASA_URL}/${obj.roverName}/photos?api_key=${API_KEY}&${obj.dateFormat}=${obj[obj.dateFormat]}&camera=${obj.camera}&page=1`;
+            const url = `${NASA_URL}/${obj.roverName}/photos?api_key=${API_KEY}&${obj.dateFormat}=${obj[obj.dateFormat]}&camera=${obj.camera}&page=${Pages}`;
             const data = await fetchData(url);
             return Promise.resolve(data);
         } catch (e) {

@@ -81,9 +81,6 @@ const imagesBank = (function () {
     const homeImagesMap = new Map()
     const savedImagesMap = new Map()
 
-    const imagesArray = []
-    const savedImagesArray = []
-
     //default string
     const toastSavedMessage = 'image saved into your preferred list.';
     const toastNotSavedMessage = 'image was saved into your preferred list already, no duplicates allowed..'
@@ -122,7 +119,6 @@ const imagesBank = (function () {
      * @function
      */
     const saveImage = function (imgButton) {
-        //const newImage = imagesArray.find(image=> image.id===parseInt(imgButton.dataset.imgId));
         const imgId = parseInt(imgButton.dataset.imgId);
 
         let header = '';
