@@ -44,7 +44,7 @@ Ensure you have the following installed:
 
 2. Navigate to the project directory:
     ```bash
-    cd nasa-rover-images-viewer
+    cd nasaApi
     ```
 
 3. Open `index.html` in your web browser to run the application.
